@@ -47,7 +47,9 @@
 </head>
 <body>
     <h2>Contact Form</h2>
-    <form id="contactForm" method="POST" target="hidden-iframe">
+    
+    <!-- Direct form submission without JavaScript -->
+    <form action="https://script.google.com/macros/s/AKfycbwPBZjfkw-lVymRfAhiKC92lE1nNEMfNmXS7X5EKAm1RK2kk2O6EhpUqyom6XIzoJPUnw/exec" method="POST">
         <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
@@ -58,51 +60,7 @@
         </div>
         <button type="submit">Submit</button>
     </form>
-    <div id="status"></div>
     
-    <iframe name="hidden-iframe" id="hidden-iframe" style="display:none"></iframe>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('contactForm');
-            const statusDiv = document.getElementById('status');
-            const iframe = document.getElementById('hidden-iframe');
-            
-            // The webhook URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwPBZjfkw-lVymRfAhiKC92lE1nNEMfNmXS7X5EKAm1RK2kk2O6EhpUqyom6XIzoJPUnw/exec';
-            
-            // Set the form action
-            form.action = scriptURL;
-            
-            // Show "Sending..." message when form is submitted
-            form.addEventListener('submit', function() {
-                statusDiv.textContent = 'Sending...';
-                statusDiv.className = '';
-                statusDiv.style.display = 'block';
-            });
-            
-            // Handle the iframe load event
-            iframe.addEventListener('load', function() {
-                // Check if form was submitted
-                if (form.classList.contains('submitted')) {
-                    // Show success message
-                    statusDiv.textContent = 'Message sent successfully!';
-                    statusDiv.className = 'success';
-                    form.reset();
-                    
-                    // Show alert
-                    alert('Message sent successfully!');
-                    
-                    // Remove the submitted class
-                    form.classList.remove('submitted');
-                }
-            });
-            
-            // Add submitted class to form on submit
-            form.addEventListener('submit', function() {
-                form.classList.add('submitted');
-            });
-        });
-    </script>
+    <p>After submitting, you will be redirected to a confirmation page.</p>
 </body>
 </html> 
