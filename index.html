@@ -72,33 +72,47 @@
                 const scriptURL = 'https://script.google.com/macros/s/AKfycbx4tOGkCi6l43HD03p-IyvQVR9aRwNwh-4qjHTuNxHoCVk3K1ebpQ8IN5msl1gENZk6pg/exec';
                 
                 // Get form data
-                const formData = new FormData(form);
-                const data = {
-                    email: formData.get('email'),
-                    message: formData.get('message'),
-                    timestamp: new Date().toISOString()
-                };
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
                 
                 // Show "Sending..." message
                 statusDiv.textContent = 'Sending...';
                 statusDiv.className = '';
                 statusDiv.style.display = 'block';
                 
-                // Send data to Google Apps Script
-                fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
+                // For Google Apps Script, we'll use a different approach to avoid CORS issues
+                // Using JSONP-like approach with Google Apps Script
+                
+                // First, create a form to submit
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('message', message);
+                formData.append('timestamp', new Date().toISOString());
+                
+                // Create a hidden iframe
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                // Create a form in the iframe
+                const hiddenForm = document.createElement('form');
+                hiddenForm.method = 'POST';
+                hiddenForm.action = scriptURL;
+                
+                // Add form data as hidden inputs
+                for (const [key, value] of formData.entries()) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    hiddenForm.appendChild(input);
+                }
+                
+                // Add the form to the iframe and submit
+                iframe.contentDocument.body.appendChild(hiddenForm);
+                
+                // Set up response handler
+                iframe.onload = function() {
                     // Show success message
                     statusDiv.textContent = 'Message sent successfully!';
                     statusDiv.className = 'success';
@@ -106,13 +120,24 @@
                     
                     // Show alert
                     alert('Message sent successfully!');
-                })
-                .catch(error => {
+                    
+                    // Clean up
+                    setTimeout(function() {
+                        document.body.removeChild(iframe);
+                    }, 1000);
+                };
+                
+                iframe.onerror = function() {
                     // Show error message
-                    statusDiv.textContent = 'Error: ' + error.message;
+                    statusDiv.textContent = 'Error: Failed to send message';
                     statusDiv.className = 'error';
-                    console.error('Error:', error);
-                });
+                    
+                    // Clean up
+                    document.body.removeChild(iframe);
+                };
+                
+                // Submit the form
+                hiddenForm.submit();
             });
         });
     </script>
