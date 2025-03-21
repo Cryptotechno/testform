@@ -47,7 +47,7 @@
 </head>
 <body>
     <h2>Contact Form</h2>
-    <form id="contactForm">
+    <form id="contactForm" method="POST" target="hidden-iframe">
         <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
@@ -59,92 +59,48 @@
         <button type="submit">Submit</button>
     </form>
     <div id="status"></div>
+    
+    <iframe name="hidden-iframe" id="hidden-iframe" style="display:none"></iframe>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('contactForm');
             const statusDiv = document.getElementById('status');
+            const iframe = document.getElementById('hidden-iframe');
             
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // The webhook URL
-                const scriptURL = 'https://script.google.com/macros/s/AKfycbxJMRcSV0LHk7v00gvXUJvpBeNIe0Rs2cbAXRvurTt935A8k6hnm5i6xl8KrnQCaiGdfA/exec';
-                
-                // Get form data
-                const email = document.getElementById('email').value;
-                const message = document.getElementById('message').value;
-                
-                // Create the data object that matches the Google Apps Script structure
-                const data = {
-                    email: email,
-                    message: message
-                };
-                
-                // Show "Sending..." message
+            // The webhook URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxJMRcSV0LHk7v00gvXUJvpBeNIe0Rs2cbAXRvurTt935A8k6hnm5i6xl8KrnQCaiGdfA/exec';
+            
+            // Set the form action
+            form.action = scriptURL;
+            
+            // Show "Sending..." message when form is submitted
+            form.addEventListener('submit', function() {
                 statusDiv.textContent = 'Sending...';
                 statusDiv.className = '';
                 statusDiv.style.display = 'block';
-                
-                // For CORS issues, we'll use XMLHttpRequest with CORS headers
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', scriptURL, true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        // Show success message
-                        statusDiv.textContent = 'Message sent successfully!';
-                        statusDiv.className = 'success';
-                        form.reset();
-                        
-                        // Show alert
-                        alert('Message sent successfully!');
-                    } else {
-                        // Show error message
-                        statusDiv.textContent = 'Error: Server responded with status ' + xhr.status;
-                        statusDiv.className = 'error';
-                    }
-                };
-                
-                xhr.onerror = function() {
-                    // Show error message
-                    statusDiv.textContent = 'Error: Failed to send message. This may be due to CORS restrictions.';
-                    statusDiv.className = 'error';
-                    console.error('Network error occurred');
+            });
+            
+            // Handle the iframe load event
+            iframe.addEventListener('load', function() {
+                // Check if form was submitted
+                if (form.classList.contains('submitted')) {
+                    // Show success message
+                    statusDiv.textContent = 'Message sent successfully!';
+                    statusDiv.className = 'success';
+                    form.reset();
                     
-                    // Fallback to form submission in case of CORS issues
-                    const formData = new FormData();
-                    formData.append('email', email);
-                    formData.append('message', message);
+                    // Show alert
+                    alert('Message sent successfully!');
                     
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    document.body.appendChild(iframe);
-                    
-                    const hiddenForm = document.createElement('form');
-                    hiddenForm.method = 'POST';
-                    hiddenForm.action = scriptURL;
-                    
-                    // Add form data as hidden inputs
-                    for (const [key, value] of Object.entries(data)) {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = value;
-                        hiddenForm.appendChild(input);
-                    }
-                    
-                    iframe.contentDocument.body.appendChild(hiddenForm);
-                    hiddenForm.submit();
-                    
-                    setTimeout(function() {
-                        document.body.removeChild(iframe);
-                    }, 1000);
-                };
-                
-                // Send JSON data
-                xhr.send(JSON.stringify(data));
+                    // Remove the submitted class
+                    form.classList.remove('submitted');
+                }
+            });
+            
+            // Add submitted class to form on submit
+            form.addEventListener('submit', function() {
+                form.classList.add('submitted');
             });
         });
     </script>
