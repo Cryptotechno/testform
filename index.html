@@ -75,69 +75,76 @@
                 const email = document.getElementById('email').value;
                 const message = document.getElementById('message').value;
                 
+                // Create the data object that matches the Google Apps Script structure
+                const data = {
+                    email: email,
+                    message: message
+                };
+                
                 // Show "Sending..." message
                 statusDiv.textContent = 'Sending...';
                 statusDiv.className = '';
                 statusDiv.style.display = 'block';
                 
-                // For Google Apps Script, we'll use a different approach to avoid CORS issues
-                // Using JSONP-like approach with Google Apps Script
+                // For CORS issues, we'll use XMLHttpRequest with CORS headers
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', scriptURL, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
                 
-                // First, create a form to submit
-                const formData = new FormData();
-                formData.append('email', email);
-                formData.append('message', message);
-                formData.append('timestamp', new Date().toISOString());
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // Show success message
+                        statusDiv.textContent = 'Message sent successfully!';
+                        statusDiv.className = 'success';
+                        form.reset();
+                        
+                        // Show alert
+                        alert('Message sent successfully!');
+                    } else {
+                        // Show error message
+                        statusDiv.textContent = 'Error: Server responded with status ' + xhr.status;
+                        statusDiv.className = 'error';
+                    }
+                };
                 
-                // Create a hidden iframe
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-                
-                // Create a form in the iframe
-                const hiddenForm = document.createElement('form');
-                hiddenForm.method = 'POST';
-                hiddenForm.action = scriptURL;
-                
-                // Add form data as hidden inputs
-                for (const [key, value] of formData.entries()) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = value;
-                    hiddenForm.appendChild(input);
-                }
-                
-                // Add the form to the iframe and submit
-                iframe.contentDocument.body.appendChild(hiddenForm);
-                
-                // Set up response handler
-                iframe.onload = function() {
-                    // Show success message
-                    statusDiv.textContent = 'Message sent successfully!';
-                    statusDiv.className = 'success';
-                    form.reset();
+                xhr.onerror = function() {
+                    // Show error message
+                    statusDiv.textContent = 'Error: Failed to send message. This may be due to CORS restrictions.';
+                    statusDiv.className = 'error';
+                    console.error('Network error occurred');
                     
-                    // Show alert
-                    alert('Message sent successfully!');
+                    // Fallback to form submission in case of CORS issues
+                    const formData = new FormData();
+                    formData.append('email', email);
+                    formData.append('message', message);
                     
-                    // Clean up
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                    
+                    const hiddenForm = document.createElement('form');
+                    hiddenForm.method = 'POST';
+                    hiddenForm.action = scriptURL;
+                    
+                    // Add form data as hidden inputs
+                    for (const [key, value] of Object.entries(data)) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        hiddenForm.appendChild(input);
+                    }
+                    
+                    iframe.contentDocument.body.appendChild(hiddenForm);
+                    hiddenForm.submit();
+                    
                     setTimeout(function() {
                         document.body.removeChild(iframe);
                     }, 1000);
                 };
                 
-                iframe.onerror = function() {
-                    // Show error message
-                    statusDiv.textContent = 'Error: Failed to send message';
-                    statusDiv.className = 'error';
-                    
-                    // Clean up
-                    document.body.removeChild(iframe);
-                };
-                
-                // Submit the form
-                hiddenForm.submit();
+                // Send JSON data
+                xhr.send(JSON.stringify(data));
             });
         });
     </script>
