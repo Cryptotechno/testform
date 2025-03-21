@@ -4,63 +4,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 0 auto;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
         }
-        .form-group {
-            margin-bottom: 15px;
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            transform: translateY(0);
+            animation: fadeIn 0.6s ease-out;
         }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            transition: all 0.3s ease;
         }
+        
         input, textarea {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
         }
+        
+        input:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        input:focus + label, textarea:focus + label {
+            color: #3498db;
+        }
+        
         button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
             border: none;
+            padding: 14px 20px;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            transform: translateY(0);
         }
-        #status {
-            margin-top: 15px;
-            padding: 10px;
-            display: none;
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
-        .success {
-            background-color: #dff0d8;
-            color: #3c763d;
+        
+        button:active {
+            transform: translateY(0);
         }
-        .error {
-            background-color: #f2dede;
-            color: #a94442;
+        
+        .note {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-group input, .form-group textarea {
+            animation: slideUp 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        .form-group:nth-child(1) input {
+            animation-delay: 0.2s;
+        }
+        
+        .form-group:nth-child(2) textarea {
+            animation-delay: 0.3s;
+        }
+        
+        button {
+            animation: fadeIn 0.5s ease-out forwards;
+            animation-delay: 0.4s;
+            opacity: 0;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Success animation for submit button */
+        @keyframes success {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .submitting {
+            background-color: #7f8c8d;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <h2>Contact Form</h2>
+    <div class="container">
+        <h2>Get In Touch</h2>
+        
+        <form action="https://script.google.com/macros/s/AKfycbztTCpEXIO-GTHJ1rzMZY7xtXUAQXViLYsxcAnVHnSXjQvCQW_hOpiiDUJNSVyTKGlYgQ/exec" method="POST" id="contactForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="message">Your Message</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" id="submitBtn">Send Message</button>
+        </form>
+        
+        <p class="note">After submitting, you will be redirected to a confirmation page.</p>
+    </div>
     
-    <!-- Direct form submission without JavaScript -->
-    <form action="https://script.google.com/macros/s/AKfycbztTCpEXIO-GTHJ1rzMZY7xtXUAQXViLYsxcAnVHnSXjQvCQW_hOpiiDUJNSVyTKGlYgQ/exec" method="POST">
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="message">Message:</label>
-            <textarea id="message" name="message" rows="5" required></textarea>
-        </div>
-        <button type="submit">Submit</button>
-    </form>
-    
-    <p>After submitting, you will be redirected to a confirmation page.</p>
+    <script>
+        // Simple animation when submitting
+        document.getElementById('contactForm').addEventListener('submit', function() {
+            const button = document.getElementById('submitBtn');
+            button.classList.add('submitting');
+            button.textContent = 'Sending...';
+        });
+        
+        // Animate form fields when they get focus
+        const formElements = document.querySelectorAll('input, textarea');
+        formElements.forEach(element => {
+            element.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-5px)';
+                this.parentElement.style.transition = 'transform 0.3s ease';
+            });
+            
+            element.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
 </body>
 </html> 
