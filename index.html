@@ -60,6 +60,61 @@
     </form>
     <div id="status"></div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contactForm');
+            const statusDiv = document.getElementById('status');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // The webhook URL
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbx4tOGkCi6l43HD03p-IyvQVR9aRwNwh-4qjHTuNxHoCVk3K1ebpQ8IN5msl1gENZk6pg/exec';
+                
+                // Get form data
+                const formData = new FormData(form);
+                const data = {
+                    email: formData.get('email'),
+                    message: formData.get('message'),
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Show "Sending..." message
+                statusDiv.textContent = 'Sending...';
+                statusDiv.className = '';
+                statusDiv.style.display = 'block';
+                
+                // Send data to Google Apps Script
+                fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Show success message
+                    statusDiv.textContent = 'Message sent successfully!';
+                    statusDiv.className = 'success';
+                    form.reset();
+                    
+                    // Show alert
+                    alert('Message sent successfully!');
+                })
+                .catch(error => {
+                    // Show error message
+                    statusDiv.textContent = 'Error: ' + error.message;
+                    statusDiv.className = 'error';
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
 </body>
 </html> 
